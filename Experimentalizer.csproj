@@ -31,7 +31,6 @@
     <UseCodebase>true</UseCodebase>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>Experimentalizer.snk</AssemblyOriginatorKeyFile>
-    <ExtensionInstallationFolder>Experimentalizer</ExtensionInstallationFolder>
     <StartAction>Program</StartAction>
     <StartProgram>$(VsInstallRoot)\Common7\IDE\devenv.exe</StartProgram>
     <StartArguments>/rootSuffix Exp</StartArguments>
@@ -111,7 +110,7 @@
       <Version>12.0.30110</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Threading">
-      <Version>15.3.20</Version>
+      <Version>15.0.240</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VSSDK.BuildTools">
       <Version>15.0.26201</Version>
