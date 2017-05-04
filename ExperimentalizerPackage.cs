@@ -34,7 +34,7 @@ namespace VisualStudio.Updater
 
         void OnDownloadCompleted(object sender, DownloadCompletedEventArgs e)
         {
-            var factory = this.GetService(typeof(SVsThreadedWaitDialogFactory)) as IVsThreadedWaitDialogFactory;
+            var factory = (IVsThreadedWaitDialogFactory)GetService(typeof(SVsThreadedWaitDialogFactory));
             IVsThreadedWaitDialog2 instance;
             factory.CreateInstance(out instance);
             var dialog = instance as IVsThreadedWaitDialog3;
@@ -89,6 +89,16 @@ namespace VisualStudio.Updater
             }
 
             dialog.EndWaitDialog();
+
+            // NOTE: example of how we could uninstall before continuing. This 
+            // will NOT work if the extension ID comes from a Willow component.
+            // var em = (IVsExtensionManager)GetService(typeof(SVsExtensionManager));
+            // var extension = em.CreateInstallableExtension(e.Payload.PackagePath);
+            // if (em.IsInstalled(extension))
+            // {
+            //     var installed = em.GetInstalledExtension(extension.Header.Identifier);
+            //     em.Uninstall(installed);
+            // }
         }
 
         public void DoEvents()
