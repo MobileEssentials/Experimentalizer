@@ -116,7 +116,7 @@
       <Version>15.0.26201</Version>
     </PackageReference>
     <PackageReference Include="MSBuilder.VsixInstaller">
-      <Version>0.2.12</Version>
+      <Version>0.2.14</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
