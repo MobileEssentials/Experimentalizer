@@ -4,10 +4,10 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Threading;
+using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ExtensionManager;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.Threading;
 
 namespace VisualStudio.Updater
 {
@@ -28,8 +28,29 @@ namespace VisualStudio.Updater
 
             dispatcher = Dispatcher.CurrentDispatcher;
 
-            var repo = (IVsExtensionRepository)GetService(typeof(SVsExtensionRepository));
-            repo.DownloadCompleted += OnDownloadCompleted;
+            System.Threading.Tasks.Task.Delay(5000)
+                .ContinueWith(async t =>
+                {
+                    await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                    var repo = (IVsExtensionRepository)GetService(typeof(SVsExtensionRepository));
+                    if (repo != null)
+                    {
+                        repo.DownloadCompleted += OnDownloadCompleted;
+                    }
+                    else
+                    {
+                        var outputWindow = GetService(typeof(SVsOutputWindow)) as IVsOutputWindow;
+                        var paneId = VSConstants.GUID_OutWindowGeneralPane;
+                        IVsOutputWindowPane generalPane;
+                        if (!ErrorHandler.Succeeded(outputWindow.GetPane(ref paneId, out generalPane)) &&
+                            ErrorHandler.Succeeded(outputWindow.CreatePane(ref paneId, "General", 1, 1)) &&
+                            ErrorHandler.Succeeded(outputWindow.GetPane(ref paneId, out generalPane)))
+                        {
+                            generalPane.OutputString("Failed to retrieve SVsExtensionRepository needed to experimentalize VSIXes.");
+                            generalPane.Activate();
+                        }
+                    }
+                });
         }
 
         void OnDownloadCompleted(object sender, DownloadCompletedEventArgs e)
@@ -47,9 +68,9 @@ namespace VisualStudio.Updater
                     szStatusBarText: "Experimentalizing VSIX",
                     fIsCancelable: true,
                     iDelayToShowDialog: 3,
-                    fShowProgress: true, 
-                    iTotalSteps: 0, 
-                    iCurrentStep: 0, 
+                    fShowProgress: true,
+                    iTotalSteps: 0,
+                    iCurrentStep: 0,
                     pCallback: new Callback());
 
             var info = new ProcessStartInfo(VsixExpPath, e.Payload.PackagePath)
